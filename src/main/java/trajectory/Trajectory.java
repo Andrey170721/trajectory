@@ -16,7 +16,7 @@ public class Trajectory {
     private final Source source;
 
     public Double getTime(){
-        return time.time;
+        return time.time();
     }
 
     public List<Double> getCoordinates(){
