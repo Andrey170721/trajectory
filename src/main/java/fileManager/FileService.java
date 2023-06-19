@@ -33,18 +33,18 @@ public class FileService {
     }
 
     public void renameFile(){
-        JFileChooser fileChooser = new JFileChooser(); // создаем экземпляр JFileChooser
-        int result = fileChooser.showOpenDialog(null); // открываем диалог выбора файла
+        JFileChooser fileChooser = new JFileChooser();
+        int result = fileChooser.showOpenDialog(null);
 
-        if (result == JFileChooser.APPROVE_OPTION) { // если пользователь выбрал файл
-            File selectedFile = fileChooser.getSelectedFile(); // получаем выбранный файл
-            String newName = JOptionPane.showInputDialog("Введите новое имя файла:"); // запрашиваем новое имя файла у пользователя
-            File newFile = new File(selectedFile.getParent(), newName + ".txt"); // создаем новый файл с новым именем в той же директории, что и старый файл
+        if (result == JFileChooser.APPROVE_OPTION) {
+            File selectedFile = fileChooser.getSelectedFile();
+            String newName = JOptionPane.showInputDialog("Введите новое имя файла:");
+            File newFile = new File(selectedFile.getParent(), newName + ".txt");
 
-            if (selectedFile.renameTo(newFile)) { // переименовываем файл
-                JOptionPane.showMessageDialog(null, "Файл успешно переименован!"); // выводим сообщение об успешном переименовании
+            if (selectedFile.renameTo(newFile)) {
+                JOptionPane.showMessageDialog(null, "Файл успешно переименован!");
             } else {
-                JOptionPane.showMessageDialog(null, "Не удалось переименовать файл!"); // выводим сообщение об ошибке при переименовании
+                JOptionPane.showMessageDialog(null, "Не удалось переименовать файл!");
             }
         }
     }
