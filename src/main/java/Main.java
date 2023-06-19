@@ -12,10 +12,10 @@ public class Main {
         //lines.add("4.0, 1976091.0, 3974537.2, 4564998.2, 1.671, 4.251, 4.931");
         //lines.add("5.0, 2976091.0, 4974537.2, 5564998.2, 2.671, 5.251, 5.931");
 
-        FileService fileService = new FileService();
-        Trajectory trajectory = fileService.openFile();
+        //FileService fileService = new FileService();
+        //Trajectory trajectory = fileService.openFile();
         //fileService.renameFile();
-        fileService.editFile(trajectory);
+        //fileService.editFile(trajectory);
 
         //Trajectory trajectory = new Trajectory(lines, "/Users/andrejpodvysockij/Desktop/traject1.txt");
 
@@ -26,5 +26,9 @@ public class Main {
         }
 
         System.out.println("Источник: " + trajectory.getPath() + ", " + trajectory.getFileName());*/
+
+        GUI app = new GUI();
+        app.setVisible(true);
+
     }
 }
