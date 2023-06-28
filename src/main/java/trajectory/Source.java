@@ -3,7 +3,8 @@ package trajectory;
 import java.io.File;
 
 public class Source {
-    public final String path;
+    private final String path;
+    private String fileName;
 
     public Source(String fullPath){
         File file = new File(fullPath);
@@ -12,5 +13,11 @@ public class Source {
 
     }
 
-    public String fileName;
+    public String getPath(){
+        return path;
+    }
+    public String getFileName(){
+        return fileName;
+    }
+
 }
