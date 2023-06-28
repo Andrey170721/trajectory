@@ -11,12 +11,10 @@ import java.util.SortedMap;
 
 public class FileService {
 
-    public Trajectory openFile() throws IOException {
-        JFileChooser fileChooser = new JFileChooser();
-        int result = fileChooser.showOpenDialog(null);
+    public static Trajectory openFile() throws IOException {
+        File selectedFile = selectFile();
         Trajectory trajectory = null;
-        if (result == JFileChooser.APPROVE_OPTION) {
-            File selectedFile = fileChooser.getSelectedFile();
+        if (selectedFile != null) {
             FileReader reader = new FileReader(selectedFile);
 
             BufferedReader bufferedReader = new BufferedReader(reader);
@@ -34,12 +32,10 @@ public class FileService {
         return trajectory;
     }
 
-    public void renameFile(){
-        JFileChooser fileChooser = new JFileChooser();
-        int result = fileChooser.showOpenDialog(null);
+    public static void renameFile(){
+        File selectedFile = selectFile();
 
-        if (result == JFileChooser.APPROVE_OPTION) {
-            File selectedFile = fileChooser.getSelectedFile();
+        if (selectedFile != null) {
             String newName = JOptionPane.showInputDialog("Введите новое имя файла:");
             File newFile = new File(selectedFile.getParent(), newName + ".txt");
 
@@ -51,14 +47,10 @@ public class FileService {
         }
     }
 
-    public void editFile(Trajectory trajectory){
+    public static void editFile(Trajectory trajectory){
+        File selectedFile = selectFile();
 
-        JFileChooser fileChooser = new JFileChooser();
-        int result = fileChooser.showSaveDialog(null);
-
-        if (result == JFileChooser.APPROVE_OPTION) {
-            File selectedFile = fileChooser.getSelectedFile();
-
+        if (selectedFile != null) {
             if (selectedFile.exists()) {
                 int option = JOptionPane.showConfirmDialog(null,
                         "Файл уже существует. Вы хотите его перезаписать?",
@@ -84,5 +76,15 @@ public class FileService {
                 e.printStackTrace();
             }
         }
+    }
+
+    public static File selectFile(){
+        JFileChooser fileChooser = new JFileChooser();
+        int result = fileChooser.showOpenDialog(null);
+        if (result == JFileChooser.APPROVE_OPTION) {
+            return fileChooser.getSelectedFile();
+        }
+
+        return null;
     }
 }
