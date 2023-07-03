@@ -31,6 +31,8 @@ public class MainFrame extends JFrame{
     private JLabel fileNameLabel;
     private JLabel tableLabel;
     private JLabel scheduleLabel;
+    List<String> savedProperties = getProperties();
+    DefaultListModel<String> listModel = new DefaultListModel<>();
     private final ButtonsListener buttonsListener = new ButtonsListener();
 
 
@@ -39,12 +41,12 @@ public class MainFrame extends JFrame{
         javax.swing.UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
         setTitle("Trajectory");
         setDefaultCloseOperation(EXIT_ON_CLOSE);
-        List<Integer> savedDividersLocations = getProperties();
-        setBounds(savedDividersLocations.get(5), savedDividersLocations.get(6), savedDividersLocations.get(4), savedDividersLocations.get(3));
+        setBounds(Integer.parseInt(savedProperties.get(5)), Integer.parseInt(savedProperties.get(6)),
+                Integer.parseInt(savedProperties.get(4)), Integer.parseInt(savedProperties.get(3)));
         createUIComponents();
-        leftSplit.setDividerLocation(savedDividersLocations.get(0));
-        rightSplit.setDividerLocation(savedDividersLocations.get(1));
-        maneSplit.setDividerLocation(savedDividersLocations.get(2));
+        leftSplit.setDividerLocation(Integer.parseInt(savedProperties.get(0)));
+        rightSplit.setDividerLocation(Integer.parseInt(savedProperties.get(1)));
+        maneSplit.setDividerLocation(Integer.parseInt(savedProperties.get(2)));
         setResizable(true);
         setVisible(true);
 
@@ -52,7 +54,6 @@ public class MainFrame extends JFrame{
         addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {
-                // сохраняем текущее положение Divider
                 List<Integer> properties = new ArrayList<>();
 
                 properties.add(leftSplit.getDividerLocation());
@@ -73,29 +74,37 @@ public class MainFrame extends JFrame{
 
     }
 
-    private List<Integer> getProperties() throws IOException {
+    private List<String> getProperties() throws IOException {
         Properties props = new Properties();
-        List<Integer> properties = new ArrayList<>();
+        List<String> properties = new ArrayList<>();
         try {
             props.load(new FileInputStream("config.properties"));
-            properties.add(Integer.parseInt(props.getProperty("leftSplit")));
-            properties.add(Integer.parseInt(props.getProperty("rightSplit")));
-            properties.add(Integer.parseInt(props.getProperty("maneSplit")));
-            properties.add(Integer.parseInt(props.getProperty("height")));
-            properties.add(Integer.parseInt(props.getProperty("width")));
-            properties.add(Integer.parseInt(props.getProperty("X")));
-            properties.add(Integer.parseInt(props.getProperty("Y")));
+            properties.add(props.getProperty("leftSplit"));
+            properties.add(props.getProperty("rightSplit"));
+            properties.add(props.getProperty("maneSplit"));
+            properties.add(props.getProperty("height"));
+            properties.add(props.getProperty("width"));
+            properties.add(props.getProperty("X"));
+            properties.add(props.getProperty("Y"));
+
 
         }catch (FileNotFoundException e){
-            properties.add(150);
-            properties.add(150);
-            properties.add(160);
-            properties.add(800);
-            properties.add(1500);
-            properties.add(500);
-            properties.add(300);
+            properties.add("150");
+            properties.add("150");
+            properties.add("160");
+            properties.add("800");
+            properties.add("1500");
+            properties.add("500");
+            properties.add("300");
         }
-
+        try{
+            for(int i = 7; i < props.size(); i++){
+                int j = 0;
+                properties.add(props.getProperty("recent" + i));
+            }
+        }catch (NullPointerException e){
+            return properties;
+        }
         return properties;
     }
 
@@ -108,19 +117,28 @@ public class MainFrame extends JFrame{
         props.setProperty("width",properties.get(4).toString());
         props.setProperty("X",properties.get(5).toString());
         props.setProperty("Y",properties.get(6).toString());
+        for(int i = 0; i < listModel.getSize(); i++){
+            props.setProperty("recent" + i, listModel.getElementAt(i));
+        }
         props.store(new FileOutputStream("config.properties"), null);
 
     }
 
     private void createUIComponents() {
-        DefaultTableModel model = new DefaultTableModel();
-        DefaultListModel<String> listModel = new DefaultListModel<>();
+        DefaultTableModel tableModel = new DefaultTableModel();
         catalog.setModel(listModel);
         JPopupMenu filePopupMenu = new JPopupMenu();
         JPopupMenu settingsPopupMenu = new JPopupMenu();
         JMenuItem open = new JMenuItem("Открыть");
-        JMenuItem openRecent = new JMenuItem("Открыть недавние>");
-        JMenuItem close = new JMenuItem("Закрыть>");
+        JMenuItem openRecent = new JMenuItem("Открыть недавние");
+//        JMenu recentFilesMenu = new JMenu("Открыть недавние");
+//        if(savedProperties.size() > 7){
+//            openRecent.add(recentFilesMenu);
+//            for(int i = 7; i < savedProperties.size(); i++){
+//                recentFilesMenu.add(new JMenuItem(savedProperties.get(i)));
+//            }
+//        }
+        JMenuItem close = new JMenuItem("Закрыть");
         JMenuItem closeAll = new JMenuItem("Закрыть все");
         JMenuItem saveWindow = new JMenuItem("Сохранить положение окон");
 
@@ -130,27 +148,19 @@ public class MainFrame extends JFrame{
         filePopupMenu.add(closeAll);
         settingsPopupMenu.add(saveWindow);
 
-        fileButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                filePopupMenu.show(fileButton, 0, fileButton.getHeight());
-            }
-        });
+        fileButton.addActionListener(e -> filePopupMenu.show(fileButton, 0, fileButton.getHeight()));
 
-        settingsButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                settingsPopupMenu.show(settingsButton, 0, settingsButton.getHeight());
-            }
-        });
+        settingsButton.addActionListener(e -> settingsPopupMenu.show(settingsButton, 0, settingsButton.getHeight()));
 
 
-        model.addColumn("Т, с");
-        model.addColumn("X, м");
-        model.addColumn("Y, м");
-        model.addColumn("Z, м");
-        model.addColumn("Vx, м/с");
-        model.addColumn("Vy, м/с");
-        model.addColumn("Vz, м/с");
-        table.setModel(model);
+        tableModel.addColumn("Т, с");
+        tableModel.addColumn("X, м");
+        tableModel.addColumn("Y, м");
+        tableModel.addColumn("Z, м");
+        tableModel.addColumn("Vx, м/с");
+        tableModel.addColumn("Vy, м/с");
+        tableModel.addColumn("Vz, м/с");
+        table.setModel(tableModel);
 
         schedule.setEditable(false);
         file.setEditable(false);
@@ -164,11 +174,18 @@ public class MainFrame extends JFrame{
 
         open.addActionListener(e -> {
             try {
-                buttonsListener.openClick(model, table, listModel, catalog);
+                buttonsListener.openClick(table, catalog, file, fileNameLabel);
             } catch (IOException ex) {
                 ex.printStackTrace();
             }
         });
+
+//        closeAll.addActionListener(e -> {
+//            catalog.setModel(listModel);
+//            file.setText("");
+//            fileNameLabel.setText("Файл не выбран");
+//            table.setModel(tableModel);
+//        });
 
     }
 

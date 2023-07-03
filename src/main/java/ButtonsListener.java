@@ -14,11 +14,15 @@ import java.util.TreeMap;
 
 public class ButtonsListener {
     Map<String, DefaultTableModel> tableModels = new TreeMap<>();
-    public void openClick(DefaultTableModel model, JTable table, DefaultListModel<String> listModel, JList<String> catalog) throws IOException {
+    Map<String, String> files = new TreeMap<>();
+    DefaultListModel<String> listModel = new DefaultListModel<>();
+
+    public void openClick( JTable table, JList<String> catalog, JTextArea file, JLabel fileNameLabel) throws IOException {
         Trajectory trajectory = FileService.openFile();
         SortedMap<Double, Point> points = trajectory.getPoints();
         List<Double> times = trajectory.getTimes();
         listModel.addElement(trajectory.getFileName());
+        catalog.setModel(listModel);
         DefaultTableModel newTableModel = new DefaultTableModel();
 
         newTableModel.addColumn("Т, с");
@@ -36,14 +40,20 @@ public class ButtonsListener {
             newTableModel.addRow(rowData);
         }
         tableModels.put(trajectory.getFileName(), newTableModel);
+        files.put(trajectory.getFileName(), FileService.openFile(trajectory.getPath() + "/" + trajectory.getFileName()));
         table.setModel(newTableModel);
+        file.setText(FileService.openFile(trajectory.getPath() + "/" + trajectory.getFileName()));
+        fileNameLabel.setText(trajectory.getFileName());
 
         catalog.addListSelectionListener(e -> {
             if(!e.getValueIsAdjusting()){
                 String selectedValue = catalog.getSelectedValue();
                 DefaultTableModel currentModel = tableModels.get(selectedValue);
                 table.setModel(currentModel);
+                file.setText(files.get(selectedValue));
+                fileNameLabel.setText(selectedValue);
             }
         });
     }
+
 }

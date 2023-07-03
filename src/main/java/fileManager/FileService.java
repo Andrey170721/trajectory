@@ -32,6 +32,29 @@ public class FileService {
         return trajectory;
     }
 
+    public static String openFile(String source){
+        JFileChooser fileChooser = new JFileChooser();
+        fileChooser.setSelectedFile(new File(source));
+        try {
+            BufferedReader reader = new BufferedReader(new FileReader(fileChooser.getSelectedFile()));
+            StringBuilder stringBuilder = new StringBuilder();
+            String line;
+
+            while ((line = reader.readLine()) != null) {
+                stringBuilder.append(line);
+                stringBuilder.append(System.lineSeparator());
+            }
+
+            reader.close();
+
+            return stringBuilder.toString();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+
     public static void renameFile(){
         File selectedFile = selectFile();
 
