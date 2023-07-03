@@ -16,7 +16,7 @@ public class MainFrame extends JFrame{
     private JPanel panelMain;
     private JButton settingsButton;
     private JButton fileButton;
-    private JList catalog;
+    private JList<String> catalog;
     private JTextArea file;
     private JTable table;
     private JTextArea schedule;
@@ -31,6 +31,7 @@ public class MainFrame extends JFrame{
     private JLabel fileNameLabel;
     private JLabel tableLabel;
     private JLabel scheduleLabel;
+    private final ButtonsListener buttonsListener = new ButtonsListener();
 
 
     public MainFrame() throws UnsupportedLookAndFeelException, ClassNotFoundException, InstantiationException, IllegalAccessException, IOException {
@@ -46,6 +47,7 @@ public class MainFrame extends JFrame{
         maneSplit.setDividerLocation(savedDividersLocations.get(2));
         setResizable(true);
         setVisible(true);
+
 
         addWindowListener(new WindowAdapter() {
             @Override
@@ -113,15 +115,20 @@ public class MainFrame extends JFrame{
     private void createUIComponents() {
         DefaultTableModel model = new DefaultTableModel();
         DefaultListModel<String> listModel = new DefaultListModel<>();
-        listModel.addElement("Траектория 1");
         catalog.setModel(listModel);
         JPopupMenu filePopupMenu = new JPopupMenu();
-        filePopupMenu.add("Открыть...");
-        filePopupMenu.add("Открыть недавние>");
-        filePopupMenu.add("Закрыть>");
-        filePopupMenu.add("Закрыть все");
         JPopupMenu settingsPopupMenu = new JPopupMenu();
-        settingsPopupMenu.add("Сохранить положение окон");
+        JMenuItem open = new JMenuItem("Открыть");
+        JMenuItem openRecent = new JMenuItem("Открыть недавние>");
+        JMenuItem close = new JMenuItem("Закрыть>");
+        JMenuItem closeAll = new JMenuItem("Закрыть все");
+        JMenuItem saveWindow = new JMenuItem("Сохранить положение окон");
+
+        filePopupMenu.add(open);
+        filePopupMenu.add(openRecent);
+        filePopupMenu.add(close);
+        filePopupMenu.add(closeAll);
+        settingsPopupMenu.add(saveWindow);
 
         fileButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -143,7 +150,6 @@ public class MainFrame extends JFrame{
         model.addColumn("Vx, м/с");
         model.addColumn("Vy, м/с");
         model.addColumn("Vz, м/с");
-        model.addRow(new Object[]{"2", "1241", "1231", "15345", "1213", "112412", "112312"});
         table.setModel(model);
 
         schedule.setEditable(false);
@@ -152,6 +158,17 @@ public class MainFrame extends JFrame{
         catalogScroller.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
         fileScroller.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
         tableScroller.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+
+
+
+
+        open.addActionListener(e -> {
+            try {
+                buttonsListener.openClick(model, table, listModel, catalog);
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
+        });
 
     }
 

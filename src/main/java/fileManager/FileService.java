@@ -78,7 +78,7 @@ public class FileService {
         }
     }
 
-    public static File selectFile(){
+    private static File selectFile(){
         JFileChooser fileChooser = new JFileChooser();
         int result = fileChooser.showOpenDialog(null);
         if (result == JFileChooser.APPROVE_OPTION) {

@@ -16,22 +16,22 @@ public class Main {
         //lines.add("5.0   2976091.0   4974537.2   5564998.2   2.671   5.251   5.931");
 
 
-        //Trajectory trajectory = FileService.openFile();
+        Trajectory trajectory = FileService.openFile();
         //FileService.renameFile();
         //FileService.editFile(trajectory);
 
         //Trajectory trajectory = new Trajectory(lines, "/Users/andrejpodvysockij/Desktop/traject1.txt");
-        //SortedMap<Double, Point> points = trajectory.getPoints();
-        //List<Double> times = trajectory.getTimes();
+        SortedMap<Double, Point> points = trajectory.getPoints();
+        List<Double> times = trajectory.getTimes();
 
-//        for(Double time : times){
-//            Point point = points.get(time);
-//            System.out.println("Время: " + time);
-//            System.out.println("Координаты: " + point.getXYZ());
-//            System.out.println("Скорость: " + point.getV());
-//        }
-//
-//        System.out.println("Источник: " + trajectory.getPath() + ", " + trajectory.getFileName());
+        for(Double time : times){
+            Point point = points.get(time);
+            System.out.println("Время: " + time);
+            System.out.println("Координаты: " + point.getXYZ());
+            System.out.println("Скорость: " + point.getV());
+        }
+
+        System.out.println("Источник: " + trajectory.getPath() + ", " + trajectory.getFileName());
 
         //MainFrame myFrame = new MainFrame();
 
