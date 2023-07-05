@@ -1,10 +1,12 @@
 package trajectory;
 
+import javax.xml.parsers.SAXParser;
 import java.util.*;
 
 public class Trajectory {
     private final SortedMap<Double, Point> points = new TreeMap<>();
     private final Source source;
+    private String name;
 
     public Trajectory(List<String> lines, String source){
         for (String str : lines) {
@@ -30,6 +32,14 @@ public class Trajectory {
         return source.getFileName();
     }
 
+    public String getName(){
+        return name;
+    }
+
+    public void rename(String newName){
+        name = newName;
+    }
+
     public String getPath(){
         return source.getPath();
     }
@@ -38,5 +48,7 @@ public class Trajectory {
         return points.size();
     }
 
-
+    public String getSource(){
+        return source.getSource();
+    }
 }

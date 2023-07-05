@@ -1,7 +1,5 @@
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.FileInputStream;
@@ -33,7 +31,7 @@ public class MainFrame extends JFrame{
     private JLabel scheduleLabel;
     List<String> savedProperties = getProperties();
     DefaultListModel<String> listModel = new DefaultListModel<>();
-    private final ButtonsListener buttonsListener = new ButtonsListener();
+    private final ButtonsService buttonsService = new ButtonsService();
 
 
     public MainFrame() throws UnsupportedLookAndFeelException, ClassNotFoundException, InstantiationException, IllegalAccessException, IOException {
@@ -174,18 +172,19 @@ public class MainFrame extends JFrame{
 
         open.addActionListener(e -> {
             try {
-                buttonsListener.openClick(table, catalog, file, fileNameLabel);
+                buttonsService.openClick(table, catalog, file, fileNameLabel);
             } catch (IOException ex) {
                 ex.printStackTrace();
             }
         });
 
-//        closeAll.addActionListener(e -> {
-//            catalog.setModel(listModel);
-//            file.setText("");
-//            fileNameLabel.setText("Файл не выбран");
-//            table.setModel(tableModel);
-//        });
+        closeAll.addActionListener(e -> {
+            buttonsService.clearListModel();
+            catalog.setModel(listModel);
+            file.setText("");
+            fileNameLabel.setText("Файл не выбран");
+            table.setModel(tableModel);
+        });
 
     }
 
