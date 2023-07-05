@@ -26,7 +26,7 @@ public class ButtonsService {
                 String selectedValue = catalog.getSelectedValue();
                 Trajectory trajectory = null;
                 for (Trajectory item: trajectories) {
-                    if(Objects.equals(item.getName(), selectedValue)) {
+                    if(Objects.equals(item.getFileName(), selectedValue)) {
                         trajectory = item;
                     }
                 }
