@@ -15,22 +15,11 @@ public class FileService {
         File selectedFile = selectFile();
         Trajectory trajectory = null;
         if (selectedFile != null) {
-            FileReader reader = new FileReader(selectedFile);
-
-            BufferedReader bufferedReader = new BufferedReader(reader);
-
-            String line;
-            List<String> lines = new ArrayList<>();
-            while ((line = bufferedReader.readLine()) != null) {
-                lines.add(line);
-            }
-            trajectory = new Trajectory(lines, selectedFile.getAbsolutePath());
-            bufferedReader.close();
-            reader.close();
-
+            trajectory = readFile(selectedFile);
         }
         return trajectory;
     }
+
 
     public static String openFile(String source){
         JFileChooser fileChooser = new JFileChooser();
@@ -44,7 +33,6 @@ public class FileService {
                 stringBuilder.append(line);
                 stringBuilder.append(System.lineSeparator());
             }
-
             reader.close();
 
             return stringBuilder.toString();
@@ -53,6 +41,13 @@ public class FileService {
         }
         return null;
     }
+
+
+        public static Trajectory openRecentFile(String source) throws IOException {
+            File file = new File(source);
+            return readFile(file);
+        }
+
 
 
     public static void renameFile(){
@@ -69,6 +64,7 @@ public class FileService {
             }
         }
     }
+
 
     public static void editFile(Trajectory trajectory){
         File selectedFile = selectFile();
@@ -101,6 +97,7 @@ public class FileService {
         }
     }
 
+
     private static File selectFile(){
         JFileChooser fileChooser = new JFileChooser();
         int result = fileChooser.showOpenDialog(null);
@@ -109,5 +106,22 @@ public class FileService {
         }
 
         return null;
+    }
+
+
+    private static Trajectory readFile(File file) throws IOException {
+        Trajectory trajectory = null;
+        FileReader reader = new FileReader(file);
+        BufferedReader bufferedReader = new BufferedReader(reader);
+
+        String line;
+        List<String> lines = new ArrayList<>();
+        while ((line = bufferedReader.readLine()) != null) {
+            lines.add(line);
+        }
+        trajectory = new Trajectory(lines, file.getAbsolutePath());
+        bufferedReader.close();
+        reader.close();
+        return trajectory;
     }
 }

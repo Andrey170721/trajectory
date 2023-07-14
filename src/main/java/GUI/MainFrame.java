@@ -1,12 +1,12 @@
+package GUI;
+
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.List;
 import java.util.Properties;
 
@@ -47,29 +47,6 @@ public class MainFrame extends JFrame{
         maneSplit.setDividerLocation(Integer.parseInt(savedProperties.get(2)));
         setResizable(true);
         setVisible(true);
-
-
-        addWindowListener(new WindowAdapter() {
-            @Override
-            public void windowClosing(WindowEvent e) {
-                List<Integer> properties = new ArrayList<>();
-
-                properties.add(leftSplit.getDividerLocation());
-                properties.add(rightSplit.getDividerLocation());
-                properties.add(maneSplit.getDividerLocation());
-                properties.add(getHeight());
-                properties.add(getWidth());
-                properties.add(getX());
-                properties.add(getY());
-
-                try {
-                    saveProperties(properties);
-                } catch (IOException ex) {
-                    ex.printStackTrace();
-                }
-            }
-        });
-
     }
 
     private List<String> getProperties() throws IOException {
@@ -95,14 +72,6 @@ public class MainFrame extends JFrame{
             properties.add("500");
             properties.add("300");
         }
-        try{
-            for(int i = 7; i < props.size(); i++){
-                int j = 0;
-                properties.add(props.getProperty("recent" + i));
-            }
-        }catch (NullPointerException e){
-            return properties;
-        }
         return properties;
     }
 
@@ -115,33 +84,69 @@ public class MainFrame extends JFrame{
         props.setProperty("width",properties.get(4).toString());
         props.setProperty("X",properties.get(5).toString());
         props.setProperty("Y",properties.get(6).toString());
-        for(int i = 0; i < listModel.getSize(); i++){
-            props.setProperty("recent" + i, listModel.getElementAt(i));
+
+        ListModel<String> lModel = catalog.getModel();
+        Properties recentFiles = new Properties();
+        try {
+            recentFiles.load(new FileInputStream("recentFiles.properties"));
+        }catch (FileNotFoundException e){
+            System.out.println("File recentFiles.properties not found");
         }
+        List<String> keys = getPropertyKeys(recentFiles);
+
+        for (int i = 0; i < lModel.getSize(); i++) {
+            if(!keys.contains(lModel.getElementAt(i))){
+                recentFiles.setProperty(lModel.getElementAt(i), buttonsService.getSource(lModel.getElementAt(i)));
+            }
+        }
+
+
         props.store(new FileOutputStream("config.properties"), null);
+        recentFiles.store(new FileOutputStream("recentFiles.properties"), null);
 
     }
+    private List<String> getPropertyKeys(Properties property){
+        Enumeration<?> eKeys = property.propertyNames();
+        List<String> keys = new ArrayList<>();
+        while (eKeys.hasMoreElements()) {
+            keys.add((String) eKeys.nextElement());
+        }
+        return keys;
+    }
 
-    private void createUIComponents() {
+    private void createUIComponents() throws IOException {
         DefaultTableModel tableModel = new DefaultTableModel();
         catalog.setModel(listModel);
         JPopupMenu filePopupMenu = new JPopupMenu();
         JPopupMenu settingsPopupMenu = new JPopupMenu();
         JMenuItem open = new JMenuItem("Открыть");
-        JMenuItem openRecent = new JMenuItem("Открыть недавние");
-//        JMenu recentFilesMenu = new JMenu("Открыть недавние");
-//        if(savedProperties.size() > 7){
-//            openRecent.add(recentFilesMenu);
-//            for(int i = 7; i < savedProperties.size(); i++){
-//                recentFilesMenu.add(new JMenuItem(savedProperties.get(i)));
-//            }
-//        }
+        JMenu recentFilesMenu = new JMenu("Открыть недавние");
+
+        Properties recentFiles = new Properties();
+        try {
+            recentFiles.load(new FileInputStream("recentFiles.properties"));
+            List<String> keys = getPropertyKeys(recentFiles);
+            for(String item : keys){
+                JMenuItem recentButton = new JMenuItem(recentFiles.getProperty(item));
+                recentFilesMenu.add(recentButton);
+                recentButton.addActionListener(e -> {
+                    try {
+                        JMenuItem menuIten = (JMenuItem) e.getSource();
+                        buttonsService.openRecentFile(table, catalog, file, fileNameLabel, menuIten.getText());
+                    } catch (IOException ex) {
+                        ex.printStackTrace();
+                    }
+                });
+            }
+        }catch (FileNotFoundException e){
+            System.out.println("File recentFiles.properties not found");
+        }
         JMenuItem close = new JMenuItem("Закрыть");
         JMenuItem closeAll = new JMenuItem("Закрыть все");
         JMenuItem saveWindow = new JMenuItem("Сохранить положение окон");
 
         filePopupMenu.add(open);
-        filePopupMenu.add(openRecent);
+        filePopupMenu.add(recentFilesMenu);
         filePopupMenu.add(close);
         filePopupMenu.add(closeAll);
         settingsPopupMenu.add(saveWindow);
@@ -186,6 +191,34 @@ public class MainFrame extends JFrame{
             table.setModel(tableModel);
         });
 
+        close.addActionListener(e -> {
+            DefaultListModel<String> model = buttonsService.getListModel();
+
+            model.removeElement(catalog.getSelectedValue());
+            catalog.clearSelection();
+            catalog.updateUI();
+            file.setText("");
+            fileNameLabel.setText("Файл не выбран");
+            table.setModel(tableModel);
+        });
+
+        saveWindow.addActionListener(e -> {
+            List<Integer> properties = new ArrayList<>();
+
+            properties.add(leftSplit.getDividerLocation());
+            properties.add(rightSplit.getDividerLocation());
+            properties.add(maneSplit.getDividerLocation());
+            properties.add(getHeight());
+            properties.add(getWidth());
+            properties.add(getX());
+            properties.add(getY());
+
+            try {
+                saveProperties(properties);
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
+        });
     }
 
 }

@@ -1,12 +1,7 @@
-import fileManager.FileService;
-import trajectory.Point;
-import trajectory.Trajectory;
+import GUI.MainFrame;
 
 import javax.swing.*;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.SortedMap;
 
 public class Main {
 
