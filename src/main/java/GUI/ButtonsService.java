@@ -18,21 +18,27 @@ public class ButtonsService {
         addFile(table, catalog, file, fileNameLabel, currentTrajectory);
     }
 
-    public void openRecentFile(JTable table, JList<String> catalog, JTextArea file, JLabel fileNameLabel, String source) throws IOException {
+    public Boolean openRecentFile(JTable table, JList<String> catalog, JTextArea file, JLabel fileNameLabel, String source) throws IOException {
         Trajectory currentTrajectory = FileService.openRecentFile(source);
-        addFile(table, catalog, file, fileNameLabel, currentTrajectory);
+        if(currentTrajectory != null){
+            addFile(table, catalog, file, fileNameLabel, currentTrajectory);
+            return true;
+        }else{
+            return false;
+        }
     }
 
-    private void addFile(JTable table, JList<String> catalog, JTextArea file, JLabel fileNameLabel, Trajectory currentTrajectory) throws IOException {
+    private void addFile(JTable table, JList<String> catalog, JTextArea file, JLabel fileNameLabel, Trajectory currentTrajectory) {
         for (Trajectory item : trajectories) {
             if(Objects.equals(item.getSource(), currentTrajectory.getSource())){
                 Trajectory tableTrajectory = getTrajectoryFromTable((DefaultTableModel) table.getModel(), item.getSource(), item.getName());
-                if(compareTrajectories(tableTrajectory, item)){
+                System.out.println(catalog.getSelectedValue());
+                if(!Objects.equals(catalog.getSelectedValue(), item.getName()) || compareTrajectories(tableTrajectory, item)){
                     JOptionPane.showMessageDialog(null, "Эта траектория уже добавлена!");
                     return;
                 }else{
                     int result = JOptionPane.showConfirmDialog(null,
-                            "Эта раектория была изменена. При открытии вы потеряете все изменения. Хотите продолжить?",
+                            "Эта траектория была изменена. При открытии вы потеряете все изменения. Хотите продолжить?",
                             "Подтверждение", JOptionPane.YES_NO_OPTION);
                     switch (result){
                         case JOptionPane.YES_OPTION:
@@ -46,35 +52,38 @@ public class ButtonsService {
                 }
             }
         }
+        if(currentTrajectory != null){
+            String newName = JOptionPane.showInputDialog("Введите имя траектории:", "Траектория " + count);
+            if(newName != null){
+                currentTrajectory.rename(newName);
+                count++;
+                trajectories.add(currentTrajectory);
+                listModel.addElement(currentTrajectory.getName());
+                catalog.setModel(listModel);
+                catalog.setSelectedValue(listModel.getElementAt(listModel.getSize() - 1), true);
+                DefaultTableModel newTableModel = createTableModel(currentTrajectory);
+                table.setModel(newTableModel);
+                file.setText(FileService.openFile(currentTrajectory.getPath() + "/" + currentTrajectory.getFileName()));
+                fileNameLabel.setText(currentTrajectory.getFileName());
 
-        String newName = JOptionPane.showInputDialog("Введите имя траектории:", "Траектория " + count);
-        currentTrajectory.rename(newName);
-        count++;
-        trajectories.add(currentTrajectory);
-        listModel.addElement(currentTrajectory.getName());
-        catalog.setModel(listModel);
-        catalog.setSelectedValue(listModel.getElementAt(listModel.getSize() - 1), true);
-        DefaultTableModel newTableModel = createTableModel(currentTrajectory);
-        table.setModel(newTableModel);
-        file.setText(FileService.openFile(currentTrajectory.getPath() + "/" + currentTrajectory.getFileName()));
-        fileNameLabel.setText(currentTrajectory.getFileName());
-
-        catalog.addListSelectionListener(e -> {
-            if(!e.getValueIsAdjusting()){
-                String selectedValue = catalog.getSelectedValue();
-                Trajectory trajectory = null;
-                for (Trajectory item: trajectories) {
-                    if(Objects.equals(item.getName(), selectedValue)) {
-                        trajectory = item;
+                catalog.addListSelectionListener(e -> {
+                    if(!e.getValueIsAdjusting()){
+                        String selectedValue = catalog.getSelectedValue();
+                        Trajectory trajectory = null;
+                        for (Trajectory item: trajectories) {
+                            if(Objects.equals(item.getName(), selectedValue)) {
+                                trajectory = item;
+                            }
+                        }
+                        assert trajectory != null;
+                        DefaultTableModel currentModel = createTableModel(trajectory);
+                        table.setModel(currentModel);
+                        file.setText(FileService.openFile(trajectory.getSource()));
+                        fileNameLabel.setText(trajectory.getSource());
                     }
-                }
-                assert trajectory != null;
-                DefaultTableModel currentModel = createTableModel(trajectory);
-                table.setModel(currentModel);
-                file.setText(FileService.openFile(trajectory.getSource()));
-                fileNameLabel.setText(trajectory.getSource());
+                });
             }
-        });
+        }
     }
 
     public void clearListModel(){
@@ -151,4 +160,3 @@ public class ButtonsService {
         return true;
     }
 }
-

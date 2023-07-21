@@ -110,18 +110,23 @@ public class FileService {
 
 
     private static Trajectory readFile(File file) throws IOException {
-        Trajectory trajectory = null;
-        FileReader reader = new FileReader(file);
-        BufferedReader bufferedReader = new BufferedReader(reader);
+        Trajectory trajectory;
+        try {
+            FileReader reader = new FileReader(file);
+            BufferedReader bufferedReader = new BufferedReader(reader);
 
-        String line;
-        List<String> lines = new ArrayList<>();
-        while ((line = bufferedReader.readLine()) != null) {
-            lines.add(line);
+            String line;
+            List<String> lines = new ArrayList<>();
+            while ((line = bufferedReader.readLine()) != null) {
+                lines.add(line);
+            }
+            trajectory = new Trajectory(lines, file.getAbsolutePath());
+            bufferedReader.close();
+            reader.close();
+            return trajectory;
+        }catch (FileNotFoundException e){
+            JOptionPane.showMessageDialog(null, "Файл не существует. Возможно директория была изменена или файл был удален");
         }
-        trajectory = new Trajectory(lines, file.getAbsolutePath());
-        bufferedReader.close();
-        reader.close();
-        return trajectory;
+        return null;
     }
 }

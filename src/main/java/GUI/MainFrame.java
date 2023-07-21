@@ -2,13 +2,8 @@ package GUI;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 import java.io.*;
-import java.util.ArrayList;
-import java.util.Enumeration;
-import java.util.List;
-import java.util.Properties;
+import java.util.*;
 
 public class MainFrame extends JFrame{
     private JPanel panelMain;
@@ -131,8 +126,28 @@ public class MainFrame extends JFrame{
                 recentFilesMenu.add(recentButton);
                 recentButton.addActionListener(e -> {
                     try {
-                        JMenuItem menuIten = (JMenuItem) e.getSource();
-                        buttonsService.openRecentFile(table, catalog, file, fileNameLabel, menuIten.getText());
+                        JMenuItem menuItem = (JMenuItem) e.getSource();
+                        Boolean isFileExist = buttonsService.openRecentFile(table, catalog, file, fileNameLabel, menuItem.getText());
+                        if(!isFileExist){
+                            recentFilesMenu.remove(menuItem);
+                            Properties recFiles = new Properties();
+                            try {
+                                recFiles.load(new FileInputStream("recentFiles.properties"));
+                            }catch (FileNotFoundException ex){
+                                ex.printStackTrace();
+                            }
+                            Set<Object> keySet = recFiles.keySet();
+                            for (Object key : keySet) {
+                                Object value = recFiles.get(key);
+                                if (value != null && value.toString().equals(menuItem.getText())) {
+                                    recFiles.remove(key);
+                                    break;
+                                }
+                            }
+                            recFiles.remove(menuItem.getText());
+
+                            recFiles.store(new FileOutputStream("recentFiles.properties"), null);
+                        }
                     } catch (IOException ex) {
                         ex.printStackTrace();
                     }
