@@ -1,9 +1,12 @@
 package GUI;
 
+import javax.naming.Context;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.io.*;
 import java.util.*;
+
+
 
 public class MainFrame extends JFrame{
     private JPanel panelMain;
@@ -110,6 +113,11 @@ public class MainFrame extends JFrame{
     }
 
     private void createUIComponents() throws IOException {
+
+
+
+
+
         DefaultTableModel tableModel = new DefaultTableModel();
         catalog.setModel(listModel);
         JPopupMenu filePopupMenu = new JPopupMenu();

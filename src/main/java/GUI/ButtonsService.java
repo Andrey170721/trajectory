@@ -4,6 +4,7 @@ import fileManager.FileService;
 import trajectory.Point;
 import trajectory.Trajectory;
 
+import javax.naming.Context;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.io.IOException;
