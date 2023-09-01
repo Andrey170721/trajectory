@@ -15,22 +15,40 @@ public class FileService {
         File selectedFile = selectFile();
         Trajectory trajectory = null;
         if (selectedFile != null) {
-            FileReader reader = new FileReader(selectedFile);
-
-            BufferedReader bufferedReader = new BufferedReader(reader);
-
-            String line;
-            List<String> lines = new ArrayList<>();
-            while ((line = bufferedReader.readLine()) != null) {
-                lines.add(line);
-            }
-            trajectory = new Trajectory(lines, selectedFile.getAbsolutePath());
-            bufferedReader.close();
-            reader.close();
-
+            trajectory = readFile(selectedFile);
         }
         return trajectory;
     }
+
+
+    public static String openFile(String source){
+        JFileChooser fileChooser = new JFileChooser();
+        fileChooser.setSelectedFile(new File(source));
+        try {
+            BufferedReader reader = new BufferedReader(new FileReader(fileChooser.getSelectedFile()));
+            StringBuilder stringBuilder = new StringBuilder();
+            String line;
+
+            while ((line = reader.readLine()) != null) {
+                stringBuilder.append(line);
+                stringBuilder.append(System.lineSeparator());
+            }
+            reader.close();
+
+            return stringBuilder.toString();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+
+        public static Trajectory openRecentFile(String source) throws IOException {
+            File file = new File(source);
+            return readFile(file);
+        }
+
+
 
     public static void renameFile(){
         File selectedFile = selectFile();
@@ -46,6 +64,7 @@ public class FileService {
             }
         }
     }
+
 
     public static void editFile(Trajectory trajectory){
         File selectedFile = selectFile();
@@ -78,6 +97,7 @@ public class FileService {
         }
     }
 
+
     private static File selectFile(){
         JFileChooser fileChooser = new JFileChooser();
         int result = fileChooser.showOpenDialog(null);
@@ -85,6 +105,28 @@ public class FileService {
             return fileChooser.getSelectedFile();
         }
 
+        return null;
+    }
+
+
+    private static Trajectory readFile(File file) throws IOException {
+        Trajectory trajectory;
+        try {
+            FileReader reader = new FileReader(file);
+            BufferedReader bufferedReader = new BufferedReader(reader);
+
+            String line;
+            List<String> lines = new ArrayList<>();
+            while ((line = bufferedReader.readLine()) != null) {
+                lines.add(line);
+            }
+            trajectory = new Trajectory(lines, file.getAbsolutePath());
+            bufferedReader.close();
+            reader.close();
+            return trajectory;
+        }catch (FileNotFoundException e){
+            JOptionPane.showMessageDialog(null, "Файл не существует. Возможно директория была изменена или файл был удален");
+        }
         return null;
     }
 }
