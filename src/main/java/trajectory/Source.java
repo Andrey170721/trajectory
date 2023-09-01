@@ -19,6 +19,5 @@ public class Source {
     public String getFileName(){
         return fileName;
     }
-    public String getSource(){return path + '/' + fileName;}
 
 }
