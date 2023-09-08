@@ -1,6 +1,7 @@
 package GUI;
 
-import javax.naming.Context;
+import org.jfree.chart.ChartPanel;
+
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.io.*;
@@ -26,11 +27,18 @@ public class MainFrame extends JFrame{
     private JLabel fileLabel;
     private JLabel fileNameLabel;
     private JLabel tableLabel;
-    private JLabel scheduleLabel;
+    private JCheckBox XCheckBox;
+    private JCheckBox YCheckBox;
+    private JCheckBox ZCheckBox;
+    private JCheckBox VzCheckBox;
+    private JCheckBox VyCheckBox;
+    private JCheckBox VxCheckBox6;
+    private JSplitPane graphPanel;
+    Graph graph = new Graph(XCheckBox, YCheckBox, ZCheckBox, VxCheckBox6, VyCheckBox, VzCheckBox);
     JMenu recentFilesMenu = new JMenu("Открыть недавние");
     List<String> savedProperties = getProperties();
     DefaultListModel<String> listModel = new DefaultListModel<>();
-    private final ButtonsService buttonsService = new ButtonsService();
+    private final ButtonsService buttonsService = new ButtonsService(graph);
 
 
     public MainFrame() throws UnsupportedLookAndFeelException, ClassNotFoundException, InstantiationException, IllegalAccessException, IOException {
@@ -148,12 +156,14 @@ public class MainFrame extends JFrame{
         tableModel.addColumn("Vz, м/с");
         table.setModel(tableModel);
 
-        schedule.setEditable(false);
         file.setEditable(false);
 
         catalogScroller.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
         fileScroller.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
         tableScroller.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+
+        ChartPanel chartPanel = graph.getChartPanel();
+        graphPanel.setRightComponent(chartPanel);
 
         open.addActionListener(e -> {
             try {

@@ -14,15 +14,25 @@ public class ButtonsService {
     private final List<Trajectory> trajectories = new ArrayList<>();
     private final DefaultListModel<String> listModel = new DefaultListModel<>();
     private Integer count = 1;
+    Graph graph;
+
+    public ButtonsService(Graph graph){
+        this.graph = graph;
+    }
+
     public void openClick( JTable table, JList<String> catalog, JTextArea file, JLabel fileNameLabel) throws IOException {
         Trajectory currentTrajectory = FileService.openFile();
-        if(currentTrajectory != null) addFile(table, catalog, file, fileNameLabel, currentTrajectory);
+        if(currentTrajectory != null){
+            addFile(table, catalog, file, fileNameLabel, currentTrajectory);
+            graph.updateGraph(currentTrajectory);
+        }
     }
 
     public Boolean openRecentFile(JTable table, JList<String> catalog, JTextArea file, JLabel fileNameLabel, String source) throws IOException {
         Trajectory currentTrajectory = FileService.openRecentFile(source);
         if(currentTrajectory != null){
             addFile(table, catalog, file, fileNameLabel, currentTrajectory);
+            graph.updateGraph(currentTrajectory);
             return true;
         }else{
             return false;
@@ -81,6 +91,7 @@ public class ButtonsService {
                             table.setModel(currentModel);
                             file.setText(FileService.openFile(trajectory.getSource()));
                             fileNameLabel.setText(trajectory.getSource());
+                            graph.updateGraph(trajectory);
                         }
                     }
                 });
